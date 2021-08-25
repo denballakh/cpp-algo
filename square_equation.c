@@ -1,34 +1,97 @@
-#include "stdio.h"
-#include "math.h"
+/**
+ * @defgroup   SQUARE_EQUATION square equation
+ *
+ * @brief      This file implements square equation.
+ *
+ * @author     Denba
+ * @date       2021
+ */
 
-int main() {
-    float eps = 1e-5;
-    float koeff_a = 0.0, koeff_b = 0.0, koeff_c = 0.0;
-    scanf("%f%f%f", &koeff_a, &koeff_b, &koeff_c);
+#include "square_equation.h"
 
-    if (abs(koeff_a) < eps) {  // bx + c == 0
-        if (abs(koeff_b) < eps) {  // c == 0
-            if (abs(koeff_c) < eps) {  // 0 == 0
-                printf("x in (-inf, +inf)\n");
-            } else {  // 1 == 0
-                printf("x in {}\n");
-            }
-        } else {  // bx + c == 0
-            float x = -koeff_c / koeff_b;
-            printf("x in {%f}\n", x);
+/**
+ * @brief      function docstring
+ *
+ * @return     The p solution.
+ */
+PSolution Solution_New() {
+    return calloc(1, sizeof(struct Solution)); 
+}
+
+void Solution_Free(PSolution sol) {
+    free(sol); 
+}
+
+
+void SolveLinear(PSolution sol, PCoeffs coeffs) {
+    if (abs(coeffs) < eps) {
+        if (abs(coeffs->data[0]) < eps) {
+            sol->cnt = INF_SOL_CNT;
+        } else {
+            sol->cnt = 0;
         }
-    } else {  // ax^2 + bx + c
-        float d = koeff_b * koeff_b - 4 * koeff_a * koeff_c;
+    } else {
+        sol->cnt = 1;
+        sol->roots[0] = -coeffs->data[0] / coeffs->data[1];
+    }
+}
 
-        if (abs(d) < eps) {  // (x - x0)^2 == 0
-            float x = -koeff_b / (2 * koeff_a);
-            printf("x in {%f}\n", x);
-        } else if (d < 0.0) {  // (x - x0)^2 + K == 0
-            printf("x in {}\n");
-        } else {  // (x - x1) * (x - x2) == 0
-            float x1 = (-koeff_b + sqrt(d)) / (2 * koeff_a);
-            float x2 = (-koeff_b - sqrt(d)) / (2 * koeff_a);
-            printf("x in {%f, %f}\n", x1, x2);
+void SolveQuadratic(PSolution sol, PCoeffs coeffs) {
+    if (abs(coeffs->data[2]) < eps) {
+        SolveLinear(sol, coeffs);
+    } else {
+        double a = coeffs->data[2];
+        double b = coeffs->data[1];
+        double c = coeffs->data[0];
+        double D = b * b - 4 * a * c;
+
+        if (abs(D) < eps) {
+            sol->cnt = 1;
+            sol->roots[0] = -b / (2 * a);
+        } else if (D < 0.0) {
+            sol->cnt = 0;
+        } else {
+            sol->cnt = 2;
+            sol->roots[0] = (-b - sqrt(D)) / (2 * a);
+            sol->roots[1] = (-b + sqrt(D)) / (2 * a);
         }
     }
+}
+
+void Solution_Print(PSolution sol) {
+    switch (sol->cnt) {
+        case INF_SOL_CNT:
+            printf("x in (-inf, +inf)\n");
+            break;
+        case 0:
+            printf("x in {}\n");
+            break;
+        case 1:
+            printf("x in {%f}\n", sol->roots[0]);
+            break;
+        case 2:
+            printf("x in {%f, %f}\n", sol->roots[0], sol->roots[1]);
+            break;
+    }
+}
+
+
+void ReadCoeffs(PCoeffs coeffs) {
+    int res;
+    do {
+        printf("Enter three equation coefficients: \n");
+        res = scanf("%lf %lf %lf", &coeffs->data[2], &coeffs->data[1], &coeffs->data[0]);
+        fflush(stdin);
+    } while (res != 3);
+}
+
+int main() {
+    struct Solution sol;
+    struct Coeffs coeffs;
+
+    ReadCoeffs(&coeffs);
+    SolveQuadratic(&sol, &coeffs);
+    Solution_Print(&sol);
+
+    return 0;
 }
