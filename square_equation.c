@@ -1,19 +1,10 @@
 /**
- * @defgroup   SQUARE_EQUATION square equation
- *
- * @brief      This file implements square equation.
- *
- * @author     Denba
- * @date       2021
+ * @file square_equation.c
+ * 
+ * @author Баллах Денис
  */
+ #include "square_equation.h"
 
-#include "square_equation.h"
-
-/**
- * @brief      function docstring
- *
- * @return     The p solution.
- */
 PSolution Solution_New() {
     return calloc(1, sizeof(struct Solution)); 
 }
@@ -22,9 +13,8 @@ void Solution_Free(PSolution sol) {
     free(sol); 
 }
 
-
 void SolveLinear(PSolution sol, PCoeffs coeffs) {
-    if (abs(coeffs) < eps) {
+    if (abs(coeffs->data[1]) < eps) {
         if (abs(coeffs->data[0]) < eps) {
             sol->cnt = INF_SOL_CNT;
         } else {
@@ -85,7 +75,65 @@ void ReadCoeffs(PCoeffs coeffs) {
     } while (res != 3);
 }
 
+int RunTests() {
+    {
+        struct Coeffs coeffs;
+        coeffs.data[2] = 0.0;
+        coeffs.data[1] = 0.0;
+        coeffs.data[0] = 0.0;
+
+        struct Solution sol;
+        SolveQuadratic(&sol, &coeffs);
+
+        if (sol.cnt != INF_SOL_CNT) return 1;
+    }
+    {
+        struct Coeffs coeffs;
+        coeffs.data[2] = 1.0;
+        coeffs.data[1] = 2.0;
+        coeffs.data[0] = 1.0;
+
+        struct Solution sol;
+        SolveQuadratic(&sol, &coeffs);
+
+        if (sol.cnt != 1) return 1;
+        if ((sol.roots[0] - (-1.0)) > eps) return 1;
+    }
+    {
+        struct Coeffs coeffs;
+        coeffs.data[2] = 1.0;
+        coeffs.data[1] = 2.0;
+        coeffs.data[0] = 3.0;
+
+        struct Solution sol;
+        SolveQuadratic(&sol, &coeffs);
+
+        if (sol.cnt != 0) return 1;
+    }
+    {
+        struct Coeffs coeffs;
+        coeffs.data[2] = 1.0;
+        coeffs.data[1] = -5.0;
+        coeffs.data[0] = 6.0;
+
+        struct Solution sol;
+        SolveQuadratic(&sol, &coeffs);
+
+        if (sol.cnt != 2) return 1;
+        double x1 = sol.roots[0];
+        double x2 = sol.roots[1];
+        if ((abs(x1 - 2.0) + abs(x2 - 3.0) > 2 * eps) && (abs(x2 - 2.0) + abs(x1 - 3.0) > 2 * eps)) return 1;
+    }
+
+    return 0;
+}
+
+/**
+ * @brief Main function. Reads coeffs and prints solution.
+ */
 int main() {
+    assert(!RunTests());
+
     struct Solution sol;
     struct Coeffs coeffs;
 

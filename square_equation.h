@@ -1,66 +1,87 @@
 /**
- * @defgroup   SQUARE_EQUATION square equation
+ * @file square_equation.h
  *
- * @brief      This file implements square equation.
- *
- * @author     Denba
- * @date       2021
+ * @author Баллах Денис
  */
-
 #ifndef SQUARE_EQUATION_H_
 #define SQUARE_EQUATION_H_
 
 #include "stdlib.h"
 #include "stdio.h"
 #include "math.h"
+#include "assert.h"
 
-#define INF_SOL_CNT -1
-#define PSolution struct Solution*
-#define PCoeffs struct Coeffs*
+#define INF_SOL_CNT -1                  ///< Const for infinite count of solutions
+#define PSolution struct Solution*      ///< Pointer to Solution struct
+#define PCoeffs struct Coeffs*          ///< Pointer to Coeffs struct
 
-const double eps = 1e-5;
+const double eps = 1e-5;                ///< Espilon for comparation with 0.0
 
 /**
- * @brief      { struct_description }
+ * @brief           Struct for equation solution.
  */
 struct Solution {
-    int cnt;  // -1 - infinite solution count
-    double roots[2];
+    int cnt;            ///< Number of solution. -1 for infinite count of solutions.
+    double roots[2];    ///< Array of roots.
 };
 
-
-PSolution Solution_New();
 /**
- * @brief      short function docstring
+ * @brief           Allocates memory for solution struct.
+ *
+ * @return          Solution*
+ */
+PSolution Solution_New();
+
+/**
+ * @brief           Frees memory for solution struct.
+ *
+ * @param[in]       sol     Solution*
  */
 void Solution_Free(PSolution);
 
 /**
- * @brief      short function docstring
+ * @brief           Prints solution.
+ *
+ * @param[in]       sol     Solution*
  */
 void Solution_Print(PSolution);
 
 /**
- * @brief      short struct docstring
+ * @brief           Struct for equation coefficients.
  */
 struct Coeffs {
-    double data[3];
+    double data[3]; ///< Array of coefficients.
 };
 
 /**
- * @brief      short function docstring
+ * @brief           Reads coefficients from stdin.
+ *
+ * @param[out]      coeffs  Coeffs*
  */
 void ReadCoeffs(PCoeffs);
 
 
 /**
- * @brief      short function docstring
+ * @brief           Solves linear equation.
+ *
+ * @param[out]      sol     Solution*
+ * @param[in]       coeffs  Coeffs*
  */
 void SolveLinear(PSolution, PCoeffs);
 
 /**
- * @brief      short function docstring
+ * @brief           Solves quadratic equation.
+ *
+ * @param[out]      sol     Solution*
+ * @param[in]       coeffs  Coeffs*
  */
 void SolveQuadratic(PSolution, PCoeffs);
+
+/**
+ * @brief Runs tests.
+ *
+ * @return 0 - OK. 1 - Error
+ */
+int RunTests();
 
 #endif  // SQUARE_EQUATION_H_
